@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .status-container {
+            text-align: center;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 1em;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-container">
+        <h1>Is Hazem playing Pls Donate?</h1>
+        <p id="status-text">Loading...</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make an HTTP GET request to the API endpoint
+            fetch('/api/hazemIn')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update status text based on the response
+                    const statusTextElement = document.getElementById('status-text');
+                    if (data === true) {
+                        statusTextElement.textContent = 'Yes';
+                    } else if (data === false) {
+                        statusTextElement.textContent = 'No';
+                    } else {
+                        statusTextElement.textContent = 'Error';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    const statusTextElement = document.getElementById('status-text');
+                    statusTextElement.textContent = 'Error';
+                });
+        });
+
+        const checkPermission = () => {
+    if (!('serviceWorker' in navigator)) {
+        throw new Error("No support for service worker!")
+    }
+
+    if (!('Notification' in window)) {
+        throw new Error("No support for notification API");
+    }
+
+    if (!('PushManager' in window)) {
+        throw new Error("No support for Push API")
+    }
+}
+
+const registerSW = async () => {
+    const registration = await navigator.serviceWorker.register('sw.js');
+    return registration;
+}
+
+const requestNotificationPermission = async () => {
+    const permission = await Notification.requestPermission();
+
+    if (permission !== 'granted') {
+        alert("You declined notifications. This can be configured anytime in site's settings.")
+    }
+
+}
+
+const main = async () => {
+    checkPermission()
+    await requestNotificationPermission()
+    await registerSW()
+}
+main()
+    </script>
+</body>
+</html>
