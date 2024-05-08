@@ -132,7 +132,7 @@ app.use((req, res, next) => {
     res.redirect("main")
   })
 
-app.listen(8080, () => {
+app.listen(80, () => {
     console.log("web server running!")
 })
 
